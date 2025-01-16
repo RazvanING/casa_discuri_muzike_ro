@@ -8,61 +8,55 @@ require_once("include/functions.php");
 
 <?php
 if (isset($_POST["Submit"])) {
+    $Title = mysqli_real_escape_string($connection, $_POST["Title"]);
     $Category = mysqli_real_escape_string($connection, $_POST["Category"]);
+    $Post = mysqli_real_escape_string($connection, $_POST["Post"]);
     date_default_timezone_set('Europe/Bucharest');
 $CurrentTime = time();
 $DateTime = date("d-m-Y H:i:s", $CurrentTime);
 $DateTime;
 $Admin = "Razvan";
-    if (empty($Category)) {
-        $_SESSION["ErrorMessage"] = "Please fill out the category name";
-        Redirect_to("categories.php");
+$Image = mysqli_real_escape_string($connection, $_FILES["Image"]["name"]);
+$Target = "Upload/".basename($_FILES["Image"]["name"]);
+$Sample =  mysqli_real_escape_string($connection, $_FILES["Sample"]["name"]);
+$SampleTarget = "Samples/".basename($_FILES["Sample"]["name"]);
+
+
+    if (empty($Title)) {
+        $_SESSION["ErrorMessage"] = "Please fill out the title name";
+        Redirect_to("AddNewPost.php");
        
-    }elseif (strlen($Category) > 99) {
-        $_SESSION["ErrorMessage"] = "Category name is too long";
-        Redirect_to("categories.php");
+    }elseif (strlen($Title) < 2) {
+        $_SESSION["ErrorMessage"] = "Title name is too long";
+        Redirect_to("AddNewPost.php");
     } else {
         global $connection;
-        $query = "SELECT * FROM category WHERE name = '$Category'";
+        $query = "SELECT * FROM admin_panel WHERE title = '$Title'";
         $execute = mysqli_query($connection, $query);
         if (mysqli_num_rows($execute) > 0) {
-            $_SESSION["ErrorMessage"] = "Category already exists";
-            Redirect_to("categories.php");
+            $_SESSION["ErrorMessage"] = "A post with the same title already exists";
+            Redirect_to("AddNewPost.php");
         } else {
-            $query = "INSERT INTO category(datetime, name, createdby)
-            VALUES('$DateTime', '$Category', '$Admin')";
+            $query = "INSERT INTO admin_panel(datetime, title, category, author, image, sample, post)
+            VALUES('$DateTime', '$Title', '$Category', '$Admin', '$Image', '$Sample', '$Post')";
             $execute = mysqli_query($connection, $query);
+            move_uploaded_file($_FILES["Image"]["tmp_name"], $Target);
+            move_uploaded_file($_FILES["Sample"]["tmp_name"], $SampleTarget);
             if ($execute) {
-                $_SESSION["SuccessMessage"] = "Category added successfully";
-                Redirect_to("categories.php");
+                $_SESSION["SuccessMessage"] = "Post added successfully";
+                Redirect_to("AddNewPost.php");
              
             } else {
-                $_SESSION["ErrorMessage"] = "Category failed to add";
-                Redirect_to("categories.php");
+                $_SESSION["ErrorMessage"] = "Post failed to add";
+                Redirect_to("AddNewPost.php");
                 
             }
         }
     }
-        global $connection;
-        $query = "INSERT INTO category(datetime, name, createdby)
-        VALUES('$DateTime', '$Category', '$Admin')";
-        $execute = mysqli_query($connection, $query);
-        if ($execute) {
-            $_SESSION["SuccessMessage"] = "Category added successfully";
-            Redirect_to("categories.php");
-         
-        } else {
-            $_SESSION["ErrorMessage"] = "Category failed to add";
-            Redirect_to("categories.php");
-            
-        }
     }
 
 ?>
 
-<?php
-require_once("include/db.php");
-?>
 <!DOCTYPE html>
 <html>
     <head>
@@ -82,9 +76,9 @@ require_once("include/db.php");
                
                 <li ><a href="dashboard.php">
                 <span class="glyphicon glyphicon-th"></span> &nbsp; Dashboard</a> </li> <!-- &nbsp; Asta adauga un spatiu inainte de titlu ca sa nu se suprapuna textul cu iconitele -->
-                <li>  <a href="AddNewPost.php">
+                <li class="active">  <a href="AddNewPost.php">
                 <span class="glyphicon glyphicon-list-alt"></span> &nbsp;Add new post</a></li>
-                <li class="active">    <a href="categories.php">
+                <li >    <a href="categories.php">
                 <span class="glyphicon glyphicon-tags"></span> &nbsp;Categories</a></li>
                 <li>    <a href="#">
                 <span class="glyphicon glyphicon-user"></span>&nbsp; Manage admins</a></li>
@@ -98,57 +92,52 @@ require_once("include/db.php");
                 </ul>
             </div> <!--Aici se termina div-ul pentru coloana lateral stanga -->
                 <div class="col-sm-10">
-                    <h1>Manage categories</h1>
+                    <h1>Add New Post</h1>
                     <div>
                         <?php echo Message();
                         echo SuccessMessage(); ?>
                     </div>
                     <div>
-                        <form action="categories.php" method="post">
+                        <form action="AddNewPost.php" method="post" enctype="multipart/form-data">
                             <fieldset>
                                     <div class="form-group">
-                                <label for="categoryName"><span class="FieldInfo">Insert category name:</span></label>
-                                <input class="form-control" type="text" name="Category" id="categoryName" placeholder="Name">
-</div> <!-- Sfarsitul div-ului form-group -->
+                                        <label for="categoryName"><span class="FieldInfo">Title:</span></label>
+                                        <input class="form-control" type="text" name="Title" id="title" placeholder="Name">
+                                    </div> <!-- Sfarsitul div-ului form-group -->
+                                    <div class="form-group">
+                                        <label for="categorySelect"><span class="FieldInfo">Category Select:</span></label>
+                                        <select class="form-control" id="categorySelect" name="Category">
+                                            <?php
+                                            global $connection;
+                                            $viewquery = "SELECT * FROM category ORDER BY datetime desc";
+                                            $execute = mysqli_query($connection, $viewquery);
+                                            while ($DataRows = mysqli_fetch_array($execute)) {
+                                                $Id = $DataRows["id"];
+                                                $CategoryName = $DataRows["name"];
+                                            ?>
+                                            <option><?php echo $CategoryName; ?></option>
+                                            <?php } ?>
+                                        </select>
+                                    </div> <!-- Sfarsitul div-ului form-group -->
+                                    <div class="form-group">
+                                        <label for="imageSelect"><span class="FieldInfo">Select Image:</span></label>
+                                        <input type="file" class="form-control" name="Image" id="imageSelect">
+                                    </div> <!-- Sfarsitul div-ului form-group -->
+                                    <div class="form-group">
+                                        <label for="sampleSelect"><span class="FieldInfo">Select Sample(under 2mb, mp3 only):</span></label>
+                                        <input type="file" class="form-control" name="Sample" id="sampleSelect" accept=".mp3">
+                                    </div> <!-- Sfarsitul div-ului form-group -->
+                                    <div class="form-group">
+                                        <label for="postArea"><span class="FieldInfo">Post:</span></label>
+                                        <textarea class="form-control" name="Post" id="postArea"></textarea>
                             </fieldset>
                             <br>
-                            <input class="btn btn-success btn-block" type="Submit" name="Submit" value="Add new Category">
+                            <input class="btn btn-success btn-block" type="Submit" name="Submit" value="Add new Post">
                             <br>
                         </form>
                     </div>
-      <div class="table-responsive">
-        <table class="table table-striped table-hover">
-            <tr>
-                <th>No.</th>
-                <th>Date & Time</th>
-                <th>Category Name</th>
-                <th>Creator Name</th>
-                <th>Action</th>
-            </tr>
-            <?php
-            global $connection;
-            $viewquery = "SELECT * FROM category ORDER BY datetime desc";
-            $execute = mysqli_query($connection, $viewquery);
-            $SrNo = 0; // variabila pentru numarul de ordine
-            while ($DataRows = mysqli_fetch_array($execute)) {
-                $Id = $DataRows["id"];
-                $DateTime = $DataRows["datetime"];
-                $CategoryName = $DataRows["name"];
-                $CreatorName = $DataRows["createdby"];
-                $SrNo++;
-            ?>
-            <tr>
-                <td><?php echo $SrNo; ?></td>
-                <td><?php echo $DateTime; ?></td>
-                <td><?php echo $CategoryName; ?></td>
-                <td><?php echo $CreatorName; ?></td>
-                <td><a href="#">Delete</a></td>
-            </tr>
-                <?php
-                }
-                ?>
-        </table>
-        </div>
+            
+       
                 </div> <!--Aici se termina div-ul pentru zona principala de continut -->
 
             </div> <!--Aici se termina div-ul pentru coloane -->
