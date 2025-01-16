@@ -1,4 +1,5 @@
 <?php require_once("include/sessions.php"); ?>
+<?php require_once("include/functions.php"); ?>
 <!DOCTYPE html>
 <html>
     <head>
@@ -18,7 +19,7 @@
                 <h1>Razvan</h1>
                 <li class="active"><a href="dashboard.php">
                 <span class="glyphicon glyphicon-th"></span> &nbsp; Dashboard</a> </li> <!-- &nbsp; Asta adauga un spatiu inainte de titlu ca sa nu se suprapuna textul cu iconitele -->
-                <li>  <a href="#">
+                <li>  <a href="AddNewPost.php">
                 <span class="glyphicon glyphicon-list-alt"></span> &nbsp;Add new post</a></li>
                 <li>    <a href="categories.php">
                 <span class="glyphicon glyphicon-tags"></span> &nbsp;Categories</a></li>
@@ -37,7 +38,8 @@
                     
                     <h1>Admin Dashboard</h1>
                     <div>
-                        <?php echo Message(); ?>
+                        <?php echo Message();
+                        echo SuccessMessage(); ?>
                     </div>
                     <h4>About</h4>
                     <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Suscipit labore accusantium deserunt dolore est animi nesciunt, voluptatibus at maiores, laudantium pariatur impedit perferendis aliquam libero iusto iure quas et aliquid!</p>
