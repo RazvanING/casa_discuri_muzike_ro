@@ -5,6 +5,7 @@ require_once("include/db.php");
 require_once("include/sessions.php");
 require_once("include/functions.php");
 ?>
+<?php Confirm_Login(); ?>
 
 <?php
 if (isset($_POST["Submit"])) {
@@ -80,13 +81,13 @@ $SampleTarget = "Samples/".basename($_FILES["Sample"]["name"]);
                 <span class="glyphicon glyphicon-list-alt"></span> &nbsp;Add new post</a></li>
                 <li >    <a href="categories.php">
                 <span class="glyphicon glyphicon-tags"></span> &nbsp;Categories</a></li>
-                <li>    <a href="#">
+                <li>    <a href="admins.php">
                 <span class="glyphicon glyphicon-user"></span>&nbsp; Manage admins</a></li>
-                <li>    <a href="#">
+                <li>    <a href="comments.php">
                 <span class="glyphicon glyphicon-comment"></span> &nbsp;Comments</a></li>
-                <li>    <a href="#">
+                <li>    <a href="liveblog.php">
                 <span class="glyphicon glyphicon-equalizer"></span> &nbsp;Live blog</a></li>
-                <li>    <a href="#">
+                <li>    <a href="logout.php">
                 <span class="glyphicon glyphicon-log-out"></span> &nbsp;Logout</a></li>
                    
                 </ul>

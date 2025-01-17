@@ -4,8 +4,9 @@ ini_set('display_errors', 1);
 require_once("include/db.php");
 require_once("include/sessions.php");
 require_once("include/functions.php");
-?>
 
+?>
+<?php Confirm_Login(); ?>
 <?php
 if (isset($_POST["Submit"])) {
     $Category = mysqli_real_escape_string($connection, $_POST["Category"]);
@@ -142,7 +143,7 @@ require_once("include/db.php");
                 <td><?php echo $DateTime; ?></td>
                 <td><?php echo $CategoryName; ?></td>
                 <td><?php echo $CreatorName; ?></td>
-                <td><a href="#">Delete</a></td>
+                <td><a href="deleteCategory.php?id=<?php echo $Id; ?>"><span class="btn btn-danger">Delete</span></a></td>
             </tr>
                 <?php
                 }

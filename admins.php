@@ -5,7 +5,7 @@ require_once("include/db.php");
 require_once("include/sessions.php");
 require_once("include/functions.php");
 ?>
-
+<?php Confirm_Login(); ?>
 <?php
 if (isset($_POST["Submit"])) {
     $Username = mysqli_real_escape_string($connection, $_POST["Username"]);
@@ -46,6 +46,7 @@ $Admin = "Razvan";
             }
         }
     }
+}
 ?>
 
 <?php
@@ -109,7 +110,7 @@ require_once("include/db.php");
 
                             </fieldset>
                             <br>
-                            <input class="btn btn-success btn-block" type="Submit" name="Submit" value="Add new Category">
+                            <input class="btn btn-success btn-block" type="Submit" name="Submit" value="Add new admin">
                             <br>
                         </form>
                     </div>
@@ -118,32 +119,34 @@ require_once("include/db.php");
             <tr>
                 <th>No.</th>
                 <th>Date & Time</th>
-                <th>Category Name</th>
-                <th>Creator Name</th>
+                <th>Admin Name</th>
+                <th>Created by</th>
                 <th>Action</th>
             </tr>
             <?php
             global $connection;
-            $viewquery = "SELECT * FROM category ORDER BY datetime desc";
+            $viewquery = "SELECT * FROM registration ORDER BY datetime desc";
             $execute = mysqli_query($connection, $viewquery);
             $SrNo = 0; // variabila pentru numarul de ordine
             while ($DataRows = mysqli_fetch_array($execute)) {
                 $Id = $DataRows["id"];
                 $DateTime = $DataRows["datetime"];
-                $CategoryName = $DataRows["name"];
-                $CreatorName = $DataRows["createdby"];
+                $AdminName = $DataRows["username"];
+                $CreatorName = $DataRows["addedby"];
                 $SrNo++;
             ?>
             <tr>
                 <td><?php echo $SrNo; ?></td>
                 <td><?php echo $DateTime; ?></td>
-                <td><?php echo $CategoryName; ?></td>
+                <td><?php echo $AdminName; ?></td>
                 <td><?php echo $CreatorName; ?></td>
-                <td><a href="deleteCategory.php?id=<?php echo $Id; ?>"><span class="btn btn-danger">Delete</span></a></td>
+                <td><a href="deleteAdmin.php?id=<?php echo $Id; ?>"><span class="btn btn-danger">Delete</span></a></td>
             </tr>
-                <?php
-                }
-                ?>
+                
+            <?php
+            }
+            ?>
+
         </table>
         </div>
                 </div> <!--Aici se termina div-ul pentru zona principala de continut -->

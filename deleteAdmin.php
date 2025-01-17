@@ -6,13 +6,13 @@
     if (isset($_GET["id"])) {
         $IdFromURL = $_GET["id"];
         $connection;
-        $Query = "DELETE FROM category WHERE id='$IdFromURL'";
+        $Query = "DELETE FROM admin WHERE id='$IdFromURL'";
         $Execute = mysqli_query($connection, $Query);
         if ($Execute) {
-            $_SESSION["SuccessMessage"] = "Category Deleted Successfully";
-            Redirect_to("categories.php");
+            $_SESSION["SuccessMessage"] = "Admin Deleted Successfully";
+            Redirect_to("admins.php");
         } else {
             $_SESSION["ErrorMessage"] = "Something went wrong. Try again!";
-            Redirect_to("categories.php");
+            Redirect_to("admins.php");
         }
     }

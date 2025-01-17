@@ -1,6 +1,7 @@
 <?php require_once("include/sessions.php"); ?>
 <?php require_once("include/functions.php"); ?>
 <?php require_once("include/db.php"); ?>
+<?php Confirm_Login(); ?>
 <?php
 if(isset($_GET["id"])){
     $IdFromURL = $_GET["id"];
