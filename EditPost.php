@@ -17,9 +17,17 @@ $DateTime = date("d-m-Y H:i:s", $CurrentTime);
 $DateTime;
 $Admin = "Razvan";
 $Image = mysqli_real_escape_string($connection, $_FILES["Image"]["name"]);
-$Target = "Upload/".basename($_FILES["Image"]["name"]);
-$Sample =  mysqli_real_escape_string($connection, $_FILES["Sample"]["name"]);
-$SampleTarget = "Samples/".basename($_FILES["Sample"]["name"]);
+if (empty($Image)) {
+    $Image = $_POST["ExistingImage"];
+} else {
+    $Target = "Upload/" . basename($_FILES["Image"]["name"]);
+}
+$Sample = mysqli_real_escape_string($connection, $_FILES["Sample"]["name"]);
+if (empty($Sample)) {
+    $Sample = $_POST["ExistingSample"];
+} else {
+    $SampleTarget = "Samples/" . basename($_FILES["Sample"]["name"]);
+}
 
 
     if (empty($Title)) {
@@ -37,18 +45,20 @@ $SampleTarget = "Samples/".basename($_FILES["Sample"]["name"]);
             $_SESSION["ErrorMessage"] = "A post with the same title already exists";
             Redirect_to("AddNewPost.php");
         } else {
-            $query = "INSERT INTO admin_panel(datetime, title, category, author, image, sample, post)
-            VALUES('$DateTime', '$Title', '$Category', '$Admin', '$Image', '$Sample', '$Post')";
+            global $connection;
+            $EditFromURL = $_GET['Edit'];
+            $query = "UPDATE admin_panel SET datetime='$DateTime', title='$Title', category='$Category', author='$Admin', image='$Image', sample='$Sample', post='$Post' WHERE id='$EditFromURL'";
+
             $execute = mysqli_query($connection, $query);
             move_uploaded_file($_FILES["Image"]["tmp_name"], $Target);
             move_uploaded_file($_FILES["Sample"]["tmp_name"], $SampleTarget);
             if ($execute) {
-                $_SESSION["SuccessMessage"] = "Post added successfully";
-                Redirect_to("AddNewPost.php");
+                $_SESSION["SuccessMessage"] = "Post updated successfully";
+                Redirect_to("dashboard.php");
              
             } else {
-                $_SESSION["ErrorMessage"] = "Post failed to add";
-                Redirect_to("AddNewPost.php");
+                $_SESSION["ErrorMessage"] = "Post failed to update";
+                Redirect_to("dashboard.php");
                 
             }
         }
@@ -60,7 +70,7 @@ $SampleTarget = "Samples/".basename($_FILES["Sample"]["name"]);
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Add New Post</title>
+        <title>Edit Post</title>
         <link rel="stylesheet" href="css/bootstrap.min.css">
         <script src="js/jquery.min.js"></script>
         <script src="js/bootstrap.min.js"></script>
@@ -92,19 +102,35 @@ $SampleTarget = "Samples/".basename($_FILES["Sample"]["name"]);
                 </ul>
             </div> <!--Aici se termina div-ul pentru coloana lateral stanga -->
                 <div class="col-sm-10">
-                    <h1>Add New Post</h1>
+                    <h1>Update Post</h1>
                     <div>
                         <?php echo Message();
                         echo SuccessMessage(); ?>
                     </div>
                     <div>
-                        <form action="AddNewPost.php" method="post" enctype="multipart/form-data">
+                        <?php
+                        global $connection;
+                        $SearchQueryParameter = $_GET["Edit"];
+                        $viewquery = "SELECT * FROM admin_panel WHERE id='$SearchQueryParameter'";
+                        $execute = mysqli_query($connection, $viewquery);
+                        while ($DataRows = mysqli_fetch_array($execute)) {
+                            $TitleToBeUpdated = $DataRows["title"];
+                            $CategoryToBeUpdated = $DataRows["category"];
+                            $ImageToBeUpdated = $DataRows["image"];
+                            $SampleToBeUpdated = $DataRows["sample"];
+                            $PostToBeUpdated = $DataRows["post"];
+                        }
+                        ?>
+                        <form action="EditPost.php?Edit=<?php echo $SearchQueryParameter; ?>" method="post" enctype="multipart/form-data">
                             <fieldset>
                                     <div class="form-group">
                                         <label for="categoryName"><span class="FieldInfo">Title:</span></label>
-                                        <input class="form-control" type="text" name="Title" id="title" placeholder="Name">
+                                        <input value="<?php echo $TitleToBeUpdated; ?>" class="form-control" type="text" name="Title" id="title" placeholder="Name">
                                     </div> <!-- Sfarsitul div-ului form-group -->
                                     <div class="form-group">
+                                        <span class="FieldInfo">Existing Category:</span>
+                                        <?php echo $CategoryToBeUpdated; ?>
+                                        <br>
                                         <label for="categorySelect"><span class="FieldInfo">Category Select:</span></label>
                                         <select class="form-control" id="categorySelect" name="Category">
                                             <?php
@@ -120,19 +146,30 @@ $SampleTarget = "Samples/".basename($_FILES["Sample"]["name"]);
                                         </select>
                                     </div> <!-- Sfarsitul div-ului form-group -->
                                     <div class="form-group">
+                                        <span class="FieldInfo">Existing Image:</span>
+                                        <img src="Upload/<?php echo $ImageToBeUpdated; ?>" width="100px"; height="50px";>
                                         <label for="imageSelect"><span class="FieldInfo">Select Image:</span></label>
                                         <input type="file" class="form-control" name="Image" id="imageSelect">
+                                        <input type="hidden" name="ExistingImage" value="<?php echo $ImageToBeUpdated; ?>">
                                     </div> <!-- Sfarsitul div-ului form-group -->
                                     <div class="form-group">
+                                        <span class="FieldInfo">Existing Sample:</span>
+                                        <audio controls>
+                                            <source src="Samples/<?php echo $SampleToBeUpdated; ?>" type="audio/mpeg">
+                                        </audio>
                                         <label for="sampleSelect"><span class="FieldInfo">Select Sample(under 2mb, mp3 only):</span></label>
                                         <input type="file" class="form-control" name="Sample" id="sampleSelect" accept=".mp3">
+                                        <input type="hidden" name="ExistingSample" value="<?php echo $SampleToBeUpdated; ?>">
                                     </div> <!-- Sfarsitul div-ului form-group -->
                                     <div class="form-group">
                                         <label for="postArea"><span class="FieldInfo">Post:</span></label>
-                                        <textarea class="form-control" name="Post" id="postArea"></textarea>
+                                        <textarea class="form-control" name="Post" id="postArea">
+                                            <?php echo $PostToBeUpdated; ?>
+
+                                        </textarea>
                             </fieldset>
                             <br>
-                            <input class="btn btn-success btn-block" type="Submit" name="Submit" value="Add new Post">
+                            <input class="btn btn-success btn-block" type="Submit" name="Submit" value="Update Post">
                             <br>
                         </form>
                     </div>
@@ -150,3 +187,5 @@ $SampleTarget = "Samples/".basename($_FILES["Sample"]["name"]);
         </div> <!--Aici se termina div-ul pentru footer -->
     </body>
 </html>
+<?php
+?>

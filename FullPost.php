@@ -8,7 +8,7 @@ require_once("include/functions.php");
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Blog page</title>
+    <title>Full Blog post</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/publicstyles.css">
@@ -69,7 +69,12 @@ require_once("include/functions.php");
                     $Search = $_GET["Search"];
                     $ViewQuery = "SELECT * FROM admin_panel WHERE datetime LIKE '%$Search%' OR title LIKE '%$Search%' OR category LIKE '%$Search%' OR post LIKE '%$Search%'";
                 } else {
-                    $ViewQuery = "SELECT * FROM admin_panel ORDER BY datetime desc";
+                    $PostIdFromURL = $_GET["id"];
+                    if (!isset($PostIdFromURL)) {
+                        $_SESSION["ErrorMessage"] = "Bad request!";
+                        Redirect_to("Blog.php");
+                    }
+                    $ViewQuery = "SELECT * FROM admin_panel WHERE id = '$PostIdFromURL' ORDER BY datetime desc";
                 }
 
                 $Execute = mysqli_query($connection, $ViewQuery);
@@ -90,16 +95,14 @@ require_once("include/functions.php");
                         <p class="description">Category: <?php echo htmlentities($Category); ?> Published on <?php echo htmlentities($DateTime); ?></p>
                         <p class="post">
                             <?php
-                            if (strlen($Post) > 150) {
-                                $Post = substr($Post, 0, 150) . '...';
-                            }
+                          
                             echo htmlentities($Post);
                             ?>
                         </p>
-                        <a href="FullPost.php?id=<?php echo $PostId; ?>"><span class="btn btn-info">Read more &rsaquo;&rsaquo;</span></a>
-                        <div class="embed-responsive embed-responsive-1by1">
+                        <div>
+                        <h4> Sample Audio </h4>
                             <?php if (!empty($Sample)) { ?>
-                            <audio controls class="embed-responsive-item">
+                            <audio controls >
                                 <source src="Samples/<?php echo htmlentities($Sample); ?>" type="audio/mpeg">
                                 Your browser does not support the audio element.
                             </audio>

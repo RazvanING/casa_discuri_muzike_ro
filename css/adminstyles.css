@@ -1,6 +1,61 @@
+.navbar-nav li{
+    font-weight: bold;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 1.2em;
+}
 body{
     background-color: #2f4050;
 }
 .col-sm-10{
     background-color: #ffffff;
+}
+
+#Side_menu{
+ color: #9fb1c2;
+
+}
+@media screen and (min-width: 250px) {
+    .Side_menu{
+        height: 100%; /* Full-height: remove this if you want "auto" height */
+        width: 160px; /* Set the width of the sidebar */
+        position: fixed; /* Fixed Sidebar (stay in place on scroll) */
+        z-index: 1; /* Stay on top */
+        top: 0; /* Stay at the top */
+        left: 0;
+        background-color: #111; /* Black */
+        overflow-x: hidden; /* Disable horizontal scroll */
+        padding-top: 20px;
+    }
+  }
+
+#Side_menu a{
+color: #9fb1c2;
+}
+#Side_menu .active a{
+    color:#ffffff;
+    background-color: #27AAE1;
+    font-weight: bold;
+}
+#Side_menu a:hover{
+    color: #ffffff;
+    background-color: #1ab394;
+    font-weight: bold;
+    display: block;
+}
+#Footer{
+    padding:10px;
+    border-top: 1px solid black;
+    color: #eeeeee;
+    background-color: #211f22;
+    text-align: center;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+.FieldInfo{
+    color:#9fb1c2;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 1.2em;
+
 }
