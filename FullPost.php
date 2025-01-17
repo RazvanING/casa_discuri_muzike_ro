@@ -5,6 +5,39 @@ require_once("include/db.php");
 require_once("include/sessions.php");
 require_once("include/functions.php");
 ?>
+
+<?php
+if (isset($_POST["Submit"])) {
+    $Name = mysqli_real_escape_string($connection, $_POST["Name"]);
+    $Email = mysqli_real_escape_string($connection, $_POST["Email"]);
+    $Comment = mysqli_real_escape_string($connection, $_POST["Comment"]);
+    date_default_timezone_set('Europe/Bucharest');
+    $CurrentTime = time();
+    $DateTime = date("d-m-Y H:i:s", $CurrentTime);
+    $DateTime;
+    $PostId = $_GET["id"];
+    if (empty($Name) || empty($Email) || empty($Comment)) {
+        $_SESSION["ErrorMessage"] = "All fields are required";
+    } elseif (strlen($Comment) > 500) {
+        $_SESSION["ErrorMessage"] = "Comment is too long";
+   
+    } else { 
+        global $connection;
+        $PostIdFromURL = $_GET["id"];
+        $query = "INSERT INTO comments(datetime, name, email, comment, status, admin_panel_id)
+        VALUES('$DateTime', '$Name', '$Email', '$Comment', 'OFF', '$PostIdFromURL')";
+        $execute = mysqli_query($connection, $query);
+        if ($execute) {
+            $_SESSION["SuccessMessage"] = "Comment added successfully";
+            Redirect_to("FullPost.php?id= {$PostId}");
+        } else {
+            $_SESSION["ErrorMessage"] = "Comment failed to add";
+            Redirect_to("FullPost.php?id={$PostId}");
+        }
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -14,6 +47,16 @@ require_once("include/functions.php");
     <link rel="stylesheet" href="css/publicstyles.css">
     <script src="js/jquery.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
+    <style>
+        .FieldInfo {
+            color: rgb(251, 174, 44);
+            font-family: Bitter, Georgia, "Times New Roman", Times, serif;
+            font-size: 1.2em;
+        }
+        .CommentBlock {
+            background-color: #f6f7f9;
+        }
+    </style>
     <script>
         $(document).ready(function() {
             $('.navbar-toggle').click(function() {
@@ -63,7 +106,12 @@ require_once("include/functions.php");
         </div>
         <div class="row">
             <div class="col-sm-8"> <!-- Fereastra principala -->
-                <?php
+               
+               <?php
+                echo Message();
+                echo SuccessMessage();
+                ?>
+               <?php
                 global $connection;
                 if (isset($_GET["SearchButton"])) {
                     $Search = $_GET["Search"];
@@ -113,6 +161,56 @@ require_once("include/functions.php");
                 <?php
                 }
                 ?>
+                <span class="FieldInfo">Share your thoughts</span>
+                <br>
+                <span class="FieldInfo">Comments</span>
+                <br>
+                <?php
+                $connection;
+                $PostIdForComments = $_GET["id"];
+                $ExtractingCommentsQuery = "SELECT * FROM comments WHERE admin_panel_id = '$PostIdForComments' AND status = 'ON'";
+                $Execute = mysqli_query($connection, $ExtractingCommentsQuery);
+                while ($DataRows = mysqli_fetch_array($Execute)) {
+                    $CommentDate = $DataRows["datetime"];
+                    $CommenterName = $DataRows["name"];
+                    $Comments = $DataRows["comment"];
+                ?>
+                <div class="CommentBlock">
+                    <img style="margin-left: 10px; margin-top: 10px;" src="images/comment.png" width="70" height="70">
+                    <p style="margine-left: 90px" class="Comment-info"><?php echo $CommenterName; ?></p>
+                    <p style="margine-left: 90px" class="description"> <?php echo $CommentDate; ?></p>
+                    <p style="margine-left: 90px" class="Comment"><?php echo $Comments; ?></p>
+                </div>
+                <hr>
+                <?php
+                }
+                ?>
+                <br>
+                <br>
+
+                <div>
+                        <form action="FullPost.php?id=<?php echo $PostId; ?>" method="post" enctype="multipart/form-data">
+                            <fieldset>    
+                                    <div class="form-group">
+                                        <label for="Name"><span class="FieldInfo">Name:</span></label>
+                                        <input class="form-control" type="text" name="Name" id="Name" placeholder="Name">
+                                    </div> <!-- Sfarsitul div-ului form-group -->
+                                    <div class="form-group">
+                                        <label for="Email"><span class="FieldInfo">Email:</span></label>
+                                        <input class="form-control" type="email" name="Email" id="Email" placeholder="Email">
+                                    </div> <!-- Sfarsitul div-ului form-group -->
+
+                                    <div class="form-group">
+                                        <label for="commantArea"><span class="FieldInfo">Comment:</span></label>
+                                        <textarea class="form-control" name="Comment" id="commentArea"></textarea>
+                            </fieldset>
+                            <br>
+                            <input class="btn btn-primary" type="Submit" name="Submit" value="Add comment">
+                            <br>
+                        </form>
+                    </div>
+            
+       
             </div> <!-- Aici se termina div-ul pentru coloana stanga -->
             <div class="col-sm-offset-1 col-sm-3"> <!-- Fereastra secundara -->
                 <h2>Test</h2>

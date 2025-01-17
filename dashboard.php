@@ -57,10 +57,24 @@
                 <span class="glyphicon glyphicon-list-alt"></span> &nbsp;Add new post</a></li>
                 <li>    <a href="categories.php">
                 <span class="glyphicon glyphicon-tags"></span> &nbsp;Categories</a></li>
-                <li>    <a href="#">
+                <li>    <a href="admins.php">
                 <span class="glyphicon glyphicon-user"></span>&nbsp; Manage admins</a></li>
-                <li>    <a href="#">
-                <span class="glyphicon glyphicon-comment"></span> &nbsp;Comments</a></li>
+                <li>    <a href="comments.php">
+                <span class="glyphicon glyphicon-comment"></span> &nbsp;Comments
+                <?php
+                $connection;
+                $QueryTotalUnApproved = "SELECT COUNT(*) FROM comments WHERE status='OFF'";
+                $ExecuteTotalUnApproved = mysqli_query($connection, $QueryTotalUnApproved);
+                $RowsTotalUnApproved = mysqli_fetch_array($ExecuteTotalUnApproved);
+                $TotalUnApproved = array_shift($RowsTotalUnApproved);
+                if ($TotalUnApproved > 0) {
+                    ?>
+                    <span class="label label-warning pull-right">
+                        <?php echo $TotalUnApproved; ?>
+                    </span>
+                <?php } ?>
+                
+            </a></li>
                 <li>    <a href="#">
                 <span class="glyphicon glyphicon-equalizer"></span> &nbsp;Live blog</a></li>
                 <li>    <a href="#">
@@ -137,7 +151,30 @@
                                       
 
                                     </td>
-                                    <td>Comments</td>
+                                    <td>
+                                        <?php
+                                        $QueryApproved = "SELECT COUNT(*) FROM comments WHERE admin_panel_id='$Id' AND status='ON'";
+                                        $ExecuteApproved = mysqli_query($connection, $QueryApproved);
+                                        $RowsApproved = mysqli_fetch_array($ExecuteApproved);
+                                        $TotalApproved = array_shift($RowsApproved);
+                                        if ($TotalApproved > 0) {
+                                            ?>
+                                            <span class="label label-success pull-right">
+                                                <?php echo $TotalApproved; ?>
+                                            </span>
+                                        <?php } ?>
+                                        <?php
+                                        $QueryUnApproved = "SELECT COUNT(*) FROM comments WHERE admin_panel_id='$Id' AND status='OFF'";
+                                        $ExecuteUnApproved = mysqli_query($connection, $QueryUnApproved);
+                                        $RowsUnApproved = mysqli_fetch_array($ExecuteUnApproved);
+                                        $TotalUnApproved = array_shift($RowsUnApproved);
+                                        if ($TotalUnApproved > 0) {
+                                            ?>
+                                            <span class="label label-danger pull-left">
+                                                <?php echo $TotalUnApproved; ?>
+                                            </span>
+                                        <?php } ?>
+                                    </td>
                                     <td>
                                     <a href="EditPost.php?Edit=<?php echo $Id; ?>">
                                             <span class="btn btn-warning"> Edit
